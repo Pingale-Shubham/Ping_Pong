@@ -1,34 +1,34 @@
 document.addEventListener("DOMContentLoaded", function () {
   const ball = document.getElementById("ball");
   const paddle = document.getElementById("paddle");
+  const scoreDisplay = document.getElementById("score");
   const gameContainer = document.getElementById("game-container");
-  const scoreDisplay = document.createElement("div");
-  scoreDisplay.id = "score";
-  gameContainer.appendChild(scoreDisplay);
 
   let ballX = 300;
   let ballY = 200;
   let ballSpeedX = 5;
   let ballSpeedY = 5;
-
   let paddleY = 150;
   let score = 0;
 
+  // Function to update game state
   function update() {
-    // Update ball position
+    // Move the ball
     ballX += ballSpeedX;
     ballY += ballSpeedY;
 
-    // Bounce off walls
-    if (ballX <= 0 || ballX >= gameContainer.clientWidth - 20) {
+    // Ball collision with walls
+    if (ballX <= 0) {
+      resetGame();
+    }
+    if (ballX >= gameContainer.clientWidth - 20) {
       ballSpeedX = -ballSpeedX;
     }
-
     if (ballY <= 0 || ballY >= gameContainer.clientHeight - 20) {
       ballSpeedY = -ballSpeedY;
     }
 
-    // Bounce off paddle
+    // Ball collision with paddle
     if (
       ballX <= 10 &&
       ballY + 20 >= paddleY &&
@@ -43,34 +43,41 @@ document.addEventListener("DOMContentLoaded", function () {
       const mouseY = event.clientY - gameContainer.getBoundingClientRect().top;
       paddleY = mouseY - paddle.clientHeight / 2;
 
-      // Limit paddle movement within the game container
-      if (paddleY < 0) {
-        paddleY = 0;
-      }
+      // Restrict paddle movement within game boundaries
+      if (paddleY < 0) paddleY = 0;
       if (paddleY > gameContainer.clientHeight - paddle.clientHeight) {
         paddleY = gameContainer.clientHeight - paddle.clientHeight;
       }
     });
 
-    // Update ball position in the DOM
+    // Update ball and paddle positions
     ball.style.left = ballX + "px";
     ball.style.top = ballY + "px";
-
-    // Update paddle position in the DOM
     paddle.style.top = paddleY + "px";
   }
 
+  // Function to increase score
   function increaseScore() {
     score++;
     scoreDisplay.innerText = "Score: " + score;
   }
 
-  // Game loop
+  // Function to reset game when the ball goes out
+  function resetGame() {
+    score = 0;
+    scoreDisplay.innerText = "Score: 0";
+    ballX = 300;
+    ballY = 200;
+    ballSpeedX = 5;
+    ballSpeedY = 5;
+  }
+
+  // Start the game loop
   function gameLoop() {
     update();
     requestAnimationFrame(gameLoop);
   }
 
-  // Start the game loop
+  // Initiate game loop
   gameLoop();
 });
